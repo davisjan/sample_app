@@ -1,4 +1,4 @@
-Autotest.add_hood :inititalize do |autotest|
+Autotest.add_hook :inititalize do |autotest|
   autotest.add_mapping(%r%^spec/(requests)/.*rb$%) do |filename, _|
     filename
   end
