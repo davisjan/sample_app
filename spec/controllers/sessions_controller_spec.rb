@@ -15,7 +15,7 @@ describe SessionsController do
   end
 
   describe "POST 'create'" do
-    describe "failure" do
+    describe "with invalid email/password" do
       before(:each) do
         @attr = { :email => 'invalid@example.com', :password => 'invalid' }
       end
@@ -32,9 +32,21 @@ describe SessionsController do
 	flash.now[:error].should =~ /invalid/i
       end
     end
-    describe "success" do
-      it "should create a new session"
-      it "should redirect to the user's show page"
+    describe "valid email and password" do
+      before(:each) do
+        @user = Factory(:user)
+	@attr = { :email => @user.email, :password => @user.password }
+      end
+      it "should sign the user in" do
+        post :create, :session => @attr
+	controller.current_user.should == @user
+	controller.should be_signed_in
+      end
+      it "should redirect to the user's show page" do
+        post :create, :session => @attr
+	response.should redirect_to(user_path(@user))
+      end
+      it "should allow signin based on a cookie"
     end
   end
 
