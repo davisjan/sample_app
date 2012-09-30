@@ -17,9 +17,6 @@ describe UsersController do
 	second = Factory(:user, :email => "another@example.com")
 	third = Factory(:user, :email => "another@example.net")
 	@users = [@user,second,third]
-	30.times do 
-	  @users << Factory(:user, :email => Factory.next(:email))
-	end
       end
       it "should be successful" do
         get :index
@@ -35,7 +32,25 @@ describe UsersController do
 	  response.should have_selector "li", :content => user.name
 	end
       end
+      it "should allow admin users to delete" do
+        @user.toggle! :admin
+        get :index
+	@users.each do |user|
+	  response.should have_selector("a", :href => user_path(user),
+	                                     'data-method' => "delete")
+	end
+      end
+      it "should not allow non-admin users to delete" do
+        get :index
+	@users.each do |user|
+	  response.should_not have_selector("a", :href => user_path(user),
+	                                         'data-method' => "delete")
+	end
+      end
       it "should paginate" do
+	30.times do 
+	  @users << Factory(:user, :email => Factory.next(:email))
+	end
         get :index
 	response.should have_selector "div.pagination"
 	response.should have_selector "span.disabled", :content => "Previous"
