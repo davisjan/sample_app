@@ -103,6 +103,12 @@ describe UsersController do
       response.should have_selector("input[name='user[password_confirmation]'][type='password']")
     end
 
+    it "should not be allowed for signed-in users" do
+      user = Factory :user
+      test_sign_in user
+      get :new
+      response.should redirect_to root_path
+    end
   end
 
   describe "POST 'create'" do
@@ -134,6 +140,13 @@ describe UsersController do
         response.should have_selector("input[name='user[password]'][type='password'][value='']")
         response.should have_selector("input[name='user[password_confirmation]'][type='password'][value='']")
       end
+
+    it "should not be allowed for signed-in users" do
+      user = Factory :user
+      test_sign_in user
+      post 'create', :user => @attr
+      response.should redirect_to root_path
+    end
 
     end
 

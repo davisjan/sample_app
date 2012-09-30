@@ -18,6 +18,12 @@ describe PagesController do
                                     :content => @base_title + " | Home")
       response.should have_selector("title", :content => "Home")
     end
+    it "should not show the sign-up link for signed-in users" do
+      user = Factory :user
+      test_sign_in user
+      get 'home'
+      response.should_not have_selector("a", :href => signup_path)
+    end
   end
 
   describe "GET 'contact'" do
