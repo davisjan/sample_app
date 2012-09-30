@@ -1,6 +1,6 @@
 namespace :bundle do
   desc "Bundle install"
-  task :install => environment do
-    sh 'bundle install --path=~/.gem/ruby/1.8"
+  task :install do 
+    sh "bundle install --path=~/.gem/ruby/1.8 --without staging:production"
   end
 end
