@@ -36,9 +36,17 @@ describe UsersController do
         @user.toggle! :admin
         get :index
 	@users.each do |user|
-	  response.should have_selector("a", :href => user_path(user),
-	                                     'data-method' => "delete")
+	  if user != @user
+  	    response.should have_selector("a", :href => user_path(user),
+	                                       'data-method' => "delete")
+          end
 	end
+      end
+      it "should not show a delete link for the signed-in admin user" do
+        @user.toggle! :admin
+        get :index
+  	response.should_not have_selector("a", :href => user_path(@user),
+	                                       'data-method' => "delete")
       end
       it "should not allow non-admin users to delete" do
         get :index
