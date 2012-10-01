@@ -96,6 +96,16 @@ describe UsersController do
      it "should have a profile image" do
        response.should have_selector("h1>img", :class => "gravatar")
      end
+
+     it "should show a user's microposts" do
+       mp1 = Factory :micropost, :user => @user, :content => "First post"
+       mp2 = Factory :micropost, :user => @user, :content => "Second post"
+       get :show, :id => @user
+       response.should have_selector "span", :class => 'content',
+                                             :content => mp1.content
+       response.should have_selector "span", :class => 'content',
+                                             :content => mp2.content
+     end
     
   end
 
