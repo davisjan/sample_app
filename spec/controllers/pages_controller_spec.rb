@@ -24,6 +24,12 @@ describe PagesController do
       get 'home'
       response.should_not have_selector("a", :href => signup_path)
     end
+    it "should show the microposts form for singed-in users" do
+      user = Factory :user
+      test_sign_in user
+      get 'home'
+      response.should have_selector("form", :action => '/microposts')
+    end
   end
 
   describe "GET 'contact'" do
