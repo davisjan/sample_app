@@ -46,7 +46,6 @@ describe SessionsController do
         post :create, :session => @attr
 	response.should redirect_to(user_path(@user))
       end
-      it "should allow signin based on a cookie"
     end
   end
 
