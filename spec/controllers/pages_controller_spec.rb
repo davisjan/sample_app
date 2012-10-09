@@ -8,27 +8,44 @@ describe PagesController do
   end
 
   describe "GET 'home'" do
-    it "should be successful" do
-      get 'home'
-      response.should be_success
+    describe "when not signed in" do
+      before :each do
+        get :home
+      end
+      it "should be successful" do
+        response.should be_success
+      end
+      it "should have the right title" do
+        response.should have_selector("title", 
+                                      :content => @base_title + " | Home")
+        response.should have_selector("title", :content => "Home")
+      end
+      it "should show the sign-up link" do
+        response.should have_selector("a", :href => signup_path)
+      end
     end
-    it "should have the right title" do
-      get 'home'
-      response.should have_selector("title", 
-                                    :content => @base_title + " | Home")
-      response.should have_selector("title", :content => "Home")
-    end
-    it "should not show the sign-up link for signed-in users" do
-      user = Factory :user
-      test_sign_in user
-      get 'home'
-      response.should_not have_selector("a", :href => signup_path)
-    end
-    it "should show the microposts form for singed-in users" do
-      user = Factory :user
-      test_sign_in user
-      get 'home'
-      response.should have_selector("form", :action => '/microposts')
+
+    describe "when signed in" do
+      before :each do
+        @user = test_sign_in(Factory(:user))
+	other_user = Factory(:user, :email => Factory.next(:email))
+	other_user.follow!(@user)
+        get :home
+      end
+      it "should not show the sign-up link" do
+        response.should_not have_selector("a", :href => signup_path)
+      end
+      it "should show the microposts form" do
+        response.should have_selector("form", :action => '/microposts')
+      end
+      it "should have the right follower/following counts" do
+        response.should have_selector('a',  
+	                              :href => following_user_path(@user),
+				      :content => 'Following 0')
+        response.should have_selector('a',  
+	                              :href => followers_user_path(@user),
+				      :content => '1 follower')
+      end
     end
   end
 
