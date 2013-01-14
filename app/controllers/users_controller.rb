@@ -4,13 +4,19 @@ class UsersController < ApplicationController
   before_filter :admin_user,   :only => [:destroy]
   before_filter :anonymous,    :only => [:new, :create]
 
+  rescue_from ActiveRecord::RecordNotFound, :with => :user_not_found
+
   def index
     @title = "All users"
     @users = User.paginate(:page => params[:page])
   end
 
   def show
-    @user = User.find(params[:id])
+    if params[:id]
+      @user = User.find(params[:id])
+    else
+      @user = current_user
+    end
     @title = @user.name
     @microposts = @user.microposts.paginate(:page => params[:page])
   end
@@ -76,6 +82,11 @@ class UsersController < ApplicationController
   end
 
   private
+
+    def user_not_found
+      flash[:error] = "User #{params[:id]} not found"
+      redirect_to :users
+    end
 
     def correct_user
       @user = User.find params[:id]
